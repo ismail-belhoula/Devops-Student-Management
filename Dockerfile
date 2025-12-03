@@ -1,5 +1,5 @@
 # Use official OpenJDK 17 image
-FROM openjdk:17.0.8-jdk-slim
+FROM openjdk:17-jdk-slim
 
 # Add the JAR built by Maven
 ARG JAR_FILE=target/student-management-0.0.1-SNAPSHOT.jar
