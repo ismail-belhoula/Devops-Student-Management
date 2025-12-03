@@ -1,6 +1,5 @@
 # Use official OpenJDK 17 image
-FROM openjdk:17-jdk-slim
-
+FROM eclipse-temurin:17-jdk
 # Add the JAR built by Maven
 ARG JAR_FILE=target/student-management-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
