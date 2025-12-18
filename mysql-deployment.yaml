@@ -1,16 +1,21 @@
+---
+# PersistentVolume
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mysql-pv
+  namespace: devops
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/data/mysql
+    path: "/mnt/data/mysql"
+  persistentVolumeReclaimPolicy: Retain
 
 ---
+# PersistentVolumeClaim
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -24,16 +29,17 @@ spec:
       storage: 5Gi
 
 ---
+# MySQL Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mysql-deployment
   namespace: devops
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mysql
-  replicas: 1
   template:
     metadata:
       labels:
@@ -42,11 +48,13 @@ spec:
       containers:
       - name: mysql
         image: mysql:8.0
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: rootpassword
         ports:
         - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        - name: MYSQL_DATABASE
+          value: "studentdb"
         volumeMounts:
         - name: mysql-storage
           mountPath: /var/lib/mysql
@@ -56,16 +64,17 @@ spec:
           claimName: mysql-pvc
 
 ---
+# MySQL Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-service
   namespace: devops
 spec:
+  type: ClusterIP
   selector:
     app: mysql
   ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
-  clusterIP: None
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
